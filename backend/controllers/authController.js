@@ -1,5 +1,5 @@
 const User = require("../models/User");
-const bcrypt = require("bcrypt.js");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
  
 //Generate JWT Token
@@ -12,7 +12,7 @@ const generateToken = (userID) => {
 //@access Public
 const registerUser = async (req, res) => {
     try{
-        const { name, email, password, profileImageUrl, adminInviteToken } = req.body;
+        const { name, email, password,mobile, profileImageUrl, adminInviteToken } = req.body;
 
         // check if user already exists
         const userExists = await User.findOne({ email });
@@ -35,6 +35,7 @@ const registerUser = async (req, res) => {
             name,
             email,
             password: hashedPassword,
+            mobile,
             profileImageUrl,
             role,
         });
@@ -44,6 +45,7 @@ const registerUser = async (req, res) => {
             _id: user._id,
             name: user.name,
             email: user.email,
+            mobile: user.mobile,
             role: user.role,
             profileImageUrl: user.profileImageUrl,
             token: generateToken(user._id),
