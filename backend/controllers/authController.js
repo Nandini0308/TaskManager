@@ -12,7 +12,7 @@ const generateToken = (userID) => {
 //@access Public
 const registerUser = async (req, res) => {
     try{
-        const { name. email, password, profileImageUrl, adminInviteToken } = req.body;
+        const { name, email, password, profileImageUrl, adminInviteToken } = req.body;
 
         // check if user already exists
         const userExists = await User.findOne({ email });
@@ -25,6 +25,30 @@ const registerUser = async (req, res) => {
         if ( adminInviteToken && adminInviteToken == process.env.ADMIN_INVITE_TOKEN){
             role = " admin"
         }
+
+        //Has Password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword= await bcrypt.hash(password, salt);
+
+        //create new user
+        const user = await User.create({
+            name,
+            email,
+            password: hashedPassword,
+            profileImageUrl,
+            role,
+        });
+
+        //return user data with JWT
+        res.status(201).json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            profileImageUrl: user.profileImageUrl,
+            token: generateToken(user._id),
+        });
+        
     }catch (error){
         res.status(500).json({ message: "Server error", error: error.message });
     }
@@ -35,6 +59,7 @@ const registerUser = async (req, res) => {
 //@access Public
 const loginUser = async (req, res) => {
     try{
+        
     }catch (error){
         res.status(500).json({ message: "Server error", error: error.message });
     }
